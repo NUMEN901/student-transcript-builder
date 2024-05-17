@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, p {
+            color: #333;
+        }
+
+        td, th {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #data-table, #data-table2 {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .table-container div {
+            flex: 1;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <div>
+            <h1><b>Population - Msc Computer Science F{{year}}</b></h1>
+            <p>Students</p>
+            <table id="data-table">
+                <thead>
+                    <tr>             
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Student email</th>
+                        <th>Courses passed</th> 
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <p>Courses</p>
+            <table id="data-table2">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>session count</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+        <script>
+            function getUrlParameter(year){
+                year=year.replace(/[\[\]]/g, '\\$&');
+                var regex=new RegExp('[?&]'+year+'(=([^&#]*)|&|#|$)'),
+                results=regex.exec(window.location.href);
+                if(!results) return null;
+                if(!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            }
+            document.addEventListener('DOMContentLoaded',async function(){
+               const tableBody=document.querySelector('#data-table tbody');
+               const tableBody2=document.querySelector('#data-table2 tbody');
+               const year = getUrlParameter('year');
+               console.log(year);
+               try{
+                const response=await fetch("/population/DSA?year="+year);
+                    const data=await response.json();
+                    console.log(data)
+                    data.forEach(function(item){
+                        console.log(item);
+                        const tr=document.createElement('tr');
+                        tr.innerHTML=`
+                        <td>${item["contact_first_name"]}</td>
+                        <td>${item["contact_last_name"]}</td>
+                        <td>${item["student_contact_ref"]}</td>
+                        <td>${item["courses_passed"]}</td>
+                        `;
+                        tr.addEventListener("click", function(){
+                            window.location.href = "/student.html?email="+encodeURIComponent(item["student_contact_ref"]);
+                        });
+                        tableBody.appendChild(tr);
+                    });
+                    const response2=await fetch("/population/DSA_courses");
+                        const data2=await response2.json();
+                        console.log(data2)
+                        data2.forEach(function(item){
+                            console.log(item);
+                            const tr=document.createElement('tr');
+                            tr.innerHTML=`
+                            <td>${item["session_course_ref"]}</td>
+                            <td>${item["session_count"]}</td>
+                            `;
+                            tableBody2.appendChild(tr);
+                        });
+                }
+            catch(error){
+                console.log(error);
+               }
+            });
+        </script>
+</body>
+</html>

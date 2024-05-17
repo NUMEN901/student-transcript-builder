@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        th {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1><b>Student final Grades per course</b></h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>email</th>
+                <th>first name</th>
+                <th>last name</th>
+                <th>Course</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <script>
+            function getUrlParameter(email){
+                email=email.replace(/[\[\]]/g, '\\$&');
+                var regex=new RegExp('[?&]'+email+'(=([^&#]*)|&|#|$)'),
+                results=regex.exec(window.location.href);
+                if(!results) return null;
+                if(!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            }
+            document.addEventListener('DOMContentLoaded',async function(){
+               const tableBody=document.querySelector('#data-table tbody');
+               const email = getUrlParameter('email');
+               console.log(email);
+               try{
+                const response=await fetch("/student?email="+email);
+                    const data=await response.json();
+                    console.log(data)
+                    data.forEach(function(item){
+                        console.log(item);
+                        const tr=document.createElement('tr');
+                        tr.innerHTML=`
+                        <td>${item["student_contact_ref"]}</td>
+                        <td>${item["contact_first_name"]}</td>
+                        <td>${item["contact_last_name"]}</td>
+                        <td>${item["grade_course_code_ref"]}</td>
+                        <td>${item["grade_score"]}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                }
+            catch(error){
+                console.log(error);
+               }
+            });
+        </script>
+</body>
+</html>
